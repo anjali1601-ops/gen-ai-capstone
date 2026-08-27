@@ -1,0 +1,16 @@
+Customer Feedback Record
+Case ID: FB-2201
+Date: 22 March 2026
+
+Customer name: Maria Alvarez
+Email: maria.alvarez@email.com
+Phone: +34-600-123-456
+Product: Northstar Cotton Bed Sheets (Order #NS-65500)
+
+Notes:
+This is not a complaint. The sheets arrived on time and match the colour shown on the website. Maria asked whether a matching pillow set is available next month. No refund, return, or defect was reported.
+
+Resolution provided: Not applicable.
+Current status: Closed
+Escalation: No
+Supporting documents: No

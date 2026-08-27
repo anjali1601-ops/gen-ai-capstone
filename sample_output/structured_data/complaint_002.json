@@ -1,0 +1,12 @@
+{
+  "customer_name": "James Okonkwo",
+  "email": "james.okonkwo@email.com",
+  "phone_number": "+44-7700-900128",
+  "complaint_category": "Delivery",
+  "issue_description": "The mixer was promised for 15 March. It arrived on 18 March, and the carton was crushed at one corner. The mixer itself powers on. I am unhappy about the delay and the damaged packaging.",
+  "resolution_provided": "Delivery partner left a note that the delay was due to weather. No replacement packaging or discount was offered.",
+  "is_complaint": "Yes",
+  "escalation_required": "No",
+  "supporting_document_available": "No",
+  "overall_case_status": "In Progress"
+}

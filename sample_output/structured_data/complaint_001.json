@@ -1,0 +1,12 @@
+{
+  "customer_name": "Priya Sharma",
+  "email": "priya.sharma@email.com",
+  "phone_number": "+91-98100-11223",
+  "complaint_category": "Billing",
+  "issue_description": "Customer was charged twice for the same order.",
+  "resolution_provided": "A support agent said a refund ticket was opened, but I have not received any refund reference number yet.",
+  "is_complaint": "Yes",
+  "escalation_required": "Yes",
+  "supporting_document_available": "Yes",
+  "overall_case_status": "Open"
+}

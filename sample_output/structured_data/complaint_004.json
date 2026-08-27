@@ -1,0 +1,12 @@
+{
+  "customer_name": "Daniel Chen",
+  "email": "daniel.chen@email.com",
+  "phone_number": "+1-415-555-0199",
+  "complaint_category": "Account",
+  "issue_description": "I cannot reset my password. The reset email never arrives. I need access before a scheduled delivery on 25 March.",
+  "resolution_provided": "Chat agent asked me to check spam. I did. The email is still missing.",
+  "is_complaint": "Yes",
+  "escalation_required": "No",
+  "supporting_document_available": "Yes",
+  "overall_case_status": "Open"
+}

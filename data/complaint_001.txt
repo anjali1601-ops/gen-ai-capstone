@@ -1,0 +1,18 @@
+Customer Complaint Record
+Case ID: CMP-1001
+Date: 12 March 2026
+
+Customer name: Priya Sharma
+Email: priya.sharma@email.com
+Phone: +91-98100-11223
+Product: Northstar Wireless Earbuds (Order #NS-88421)
+
+Issue:
+I was charged twice for the same order. The first charge of 2499 INR went through on 10 March, and a second identical charge appeared on 11 March. I have attached a screenshot of my bank statement.
+
+Resolution provided:
+A support agent said a refund ticket was opened, but I have not received any refund reference number yet.
+
+Current status: Open
+Escalation: Customer requested a supervisor if the duplicate charge is not reversed within 3 business days.
+Supporting documents: Bank statement screenshot attached.

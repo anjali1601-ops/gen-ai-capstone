@@ -1,0 +1,18 @@
+Customer Complaint Record
+Case ID: CMP-1004
+Date: 21 March 2026
+
+Customer name: Daniel Chen
+Email: daniel.chen@email.com
+Phone: +1-415-555-0199
+Service: Northstar account login
+
+Issue:
+I cannot reset my password. The reset email never arrives. I need access before a scheduled delivery on 25 March.
+
+Resolution provided:
+Chat agent asked me to check spam. I did. The email is still missing.
+
+Current status: Open
+Escalation: Not escalated.
+Supporting documents: Screenshot of empty spam folder mentioned.

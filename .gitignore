@@ -1,0 +1,13 @@
+.env
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.streamlit/
+# Live batch output. sample_output/ is tracked for evaluators.
+output/
+logs/
+*.log
+.DS_Store
+Thumbs.db

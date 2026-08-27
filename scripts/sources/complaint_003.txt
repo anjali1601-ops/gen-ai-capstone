@@ -1,0 +1,18 @@
+Customer Complaint Record
+Case ID: CMP-1003
+Date: 20 March 2026
+
+Customer name: Aisha Rahman
+Email: aisha.rahman@email.com
+Phone: Not provided
+Product: Northstar Smart Watch (Order #NS-77609)
+
+Issue:
+The heart-rate sensor stopped working after two weeks. I already sent the watch to the service centre last week as instructed on the website.
+
+Resolution provided:
+Service centre confirmed the unit was received. No diagnosis has been shared.
+
+Current status: Escalated
+Escalation: Case moved to product quality team because this is the third similar sensor failure reported this month.
+Supporting documents: Service centre intake photo attached.

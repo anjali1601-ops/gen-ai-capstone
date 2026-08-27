@@ -1,0 +1,12 @@
+{
+  "customer_name": "Maria Alvarez",
+  "email": "maria.alvarez@email.com",
+  "phone_number": "+34-600-123-456",
+  "complaint_category": "Not specified",
+  "issue_description": "This is not a complaint. The sheets arrived on time and match the colour shown on the website. Maria asked whether a matching pillow set is available next month.",
+  "resolution_provided": "Not applicable.",
+  "is_complaint": "No",
+  "escalation_required": "No",
+  "supporting_document_available": "No",
+  "overall_case_status": "Closed"
+}

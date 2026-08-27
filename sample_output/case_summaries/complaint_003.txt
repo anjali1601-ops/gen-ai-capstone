@@ -1,0 +1,5 @@
+Case overview: Aisha Rahman reported a defect with her heart-rate sensor, which stopped working after two weeks. She has already sent the watch to the service center as instructed.
+Key issue: The heart-rate sensor is non-functional, and the service center has not provided a diagnosis after receiving the unit.
+Action taken: The service center confirmed receipt of the watch, but no further diagnosis has been communicated to the customer.
+Current status: The case has been escalated due to the lack of diagnosis and resolution.
+Recommended next action: Contact the service center for an update on the diagnosis and inform the customer of the findings.

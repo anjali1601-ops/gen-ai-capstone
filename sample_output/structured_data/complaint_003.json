@@ -1,0 +1,12 @@
+{
+  "customer_name": "Aisha Rahman",
+  "email": "aisha.rahman@email.com",
+  "phone_number": null,
+  "complaint_category": "Product Defect",
+  "issue_description": "The heart-rate sensor stopped working after two weeks. I already sent the watch to the service centre last week as instructed on the website.",
+  "resolution_provided": "Service centre confirmed the unit was received. No diagnosis has been shared.",
+  "is_complaint": "Yes",
+  "escalation_required": "Yes",
+  "supporting_document_available": "Yes",
+  "overall_case_status": "Escalated"
+}
