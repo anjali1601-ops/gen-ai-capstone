@@ -6,41 +6,26 @@
   <title>Complaint Case Processor — Pipeline Architecture</title>
   <style>
     :root {
-      --bg: #07131f;
-      --navy: #0b1c33;
-      --panel: #102844;
-      --inset: #0c2036;
-      --stroke: #7ec4ea;
-      --stroke-mid: #5aa4cc;
-      --stroke-dim: #3d6f8f;
-      --ice: #d7eefb;
-      --white: #f7fbff;
-      --muted: #8fb4cc;
-      --fill: rgba(126, 196, 234, 0.10);
-      --fill-2: rgba(126, 196, 234, 0.06);
+      --ink: #06101c;
+      --navy: #0a1b32;
+      --panel: #10263f;
+      --inset: #0c1f35;
+      --cyan: #5ec8f0;
+      --cyan-2: #9adff6;
+      --amber: #f0b45c;
+      --ice: #e8f6ff;
+      --muted: #8aa9c2;
       --green: #3dce7a;
-      --red: #ef4d4d;
-      --r: 6px;
-      --r-sm: 4px;
-      --sans: "Segoe UI Variable Display", "Segoe UI", Calibri, "Helvetica Neue", Arial, sans-serif;
-      --mono: "Cascadia Mono", Consolas, "SF Mono", "Courier New", monospace;
-      --fs-kicker: 9px;
-      --fs-title: 22px;
-      --fs-lede: 12px;
-      --fs-meta-l: 8.5px;
-      --fs-meta: 11px;
-      --fs-col: 9px;
-      --fs-box: 11.5px;
-      --fs-code: 9.5px;
-      --fs-tag: 10px;
-      --fs-foot: 10px;
+      --red: #ef5a5a;
+      --sans: "Segoe UI", "Segoe UI Variable Display", Calibri, Arial, sans-serif;
+      --mono: "Cascadia Mono", Consolas, "Courier New", monospace;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
     html, body {
-      background: #040b14;
-      color: var(--white);
+      background: #030910;
+      color: var(--ice);
       font-family: var(--sans);
     }
 
@@ -48,320 +33,276 @@
       min-height: 100vh;
       display: grid;
       place-items: center;
-      padding: 20px 16px;
+      padding: 18px 12px;
     }
 
     svg { display: block; }
 
-    .ico {
-      width: 18px;
-      height: 18px;
-      flex: 0 0 auto;
-      color: var(--stroke);
-      stroke: var(--stroke);
-      fill: none;
-      stroke-width: 1.5;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-
-    .ico-lg { width: 22px; height: 22px; }
-    .ico-sm { width: 13px; height: 13px; }
-
     .slide {
       width: 13.333in;
       height: 7.5in;
-      background: var(--bg);
-      color: var(--white);
-      padding: 20px 26px 14px;
+      background:
+        radial-gradient(1200px 420px at 50% -10%, rgba(94, 200, 240, 0.10), transparent 55%),
+        linear-gradient(180deg, #0b2038 0%, var(--ink) 28%);
+      border: 1px solid #1e4466;
+      border-radius: 10px;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
       print-color-adjust: exact;
       -webkit-print-color-adjust: exact;
-      color-adjust: exact;
-      border: 1px solid #1a3a58;
     }
 
-    /* —— Header —— */
-    header.mast {
+    .banner {
       flex: 0 0 auto;
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: end;
-      gap: 24px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid var(--stroke-dim);
+      background: linear-gradient(90deg, #07203a, #0d2d52 45%, #07203a);
+      border-bottom: 1px solid #2a5a82;
+      padding: 14px 28px 13px;
+      text-align: center;
     }
 
-    .kicker {
-      font-size: var(--fs-kicker);
-      font-weight: 650;
-      letter-spacing: 0.16em;
+    .banner .kicker {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.22em;
       text-transform: uppercase;
-      color: var(--stroke);
+      color: var(--cyan);
       margin-bottom: 4px;
     }
 
-    header.mast h1 {
-      font-size: var(--fs-title);
-      font-weight: 650;
-      letter-spacing: -0.02em;
-      line-height: 1.1;
-      color: var(--white);
+    .banner h1 {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: #fff;
+      line-height: 1.15;
     }
 
-    .lede {
-      margin-top: 6px;
-      font-size: var(--fs-lede);
-      line-height: 1.35;
-      color: var(--ice);
-      max-width: 46em;
-      font-weight: 400;
-    }
-
-    .meta {
-      display: grid;
-      grid-template-columns: auto auto auto;
-      gap: 0;
-      align-items: stretch;
-    }
-
-    .meta div {
-      padding: 0 16px;
-      border-left: 1px solid var(--stroke-dim);
-    }
-
-    .meta div:first-child { padding-left: 0; border-left: 0; }
-
-    .meta dt {
-      font-size: var(--fs-meta-l);
-      font-weight: 650;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 3px;
-    }
-
-    .meta dd {
-      font-size: var(--fs-meta);
-      font-weight: 650;
-      color: var(--white);
-      white-space: nowrap;
-    }
-
-    .meta dd code {
-      font-family: var(--mono);
-      font-size: 10.5px;
+    .banner h1 span {
       font-weight: 600;
-      color: var(--stroke);
+      letter-spacing: 0.12em;
+      font-size: 15px;
+      display: block;
+      margin-top: 4px;
+      color: var(--cyan-2);
     }
 
-    /* —— Board —— */
-    .board {
+    .stage {
       flex: 1 1 auto;
       min-height: 0;
       display: grid;
-      grid-template-columns: 172px 22px minmax(0, 1fr) 22px 300px;
+      grid-template-columns: 210px 36px minmax(0, 1fr) 36px 280px;
       gap: 0;
+      padding: 16px 20px 8px;
       align-items: stretch;
-      padding-top: 14px;
     }
 
-    .col-head {
-      display: flex;
-      align-items: baseline;
-      gap: 8px;
-      margin-bottom: 8px;
-      min-height: 18px;
-    }
-
-    .col-num {
-      font-family: var(--mono);
+    .col-label {
       font-size: 10px;
-      font-weight: 700;
-      color: var(--stroke);
-      letter-spacing: 0.04em;
-    }
-
-    .col-head h2 {
-      font-size: var(--fs-col);
-      font-weight: 700;
-      letter-spacing: 0.12em;
+      font-weight: 800;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: var(--ice);
+      color: var(--cyan-2);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
 
-    .col-head code {
+    .col-label em {
+      font-style: normal;
       font-family: var(--mono);
       font-size: 9px;
-      color: var(--muted);
-      font-weight: 500;
+      font-weight: 600;
       letter-spacing: 0;
       text-transform: none;
+      color: var(--muted);
       margin-left: auto;
     }
 
-    .panel {
-      height: calc(100% - 26px);
-      border: 1px solid var(--stroke);
-      border-radius: var(--r);
-      background: var(--navy);
+    .shell {
+      height: calc(100% - 22px);
+      border-radius: 14px;
+      border: 1px solid #3d7aa3;
+      background: linear-gradient(180deg, #12304c 0%, #0b223a 100%);
+      box-shadow: inset 0 1px 0 rgba(158, 223, 255, 0.12);
     }
 
-    /* —— Input —— */
-    .input-panel {
-      padding: 14px 12px 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: stretch;
-      justify-content: space-between;
-    }
-
-    .input-hero {
+    .input-shell {
+      padding: 16px 14px 14px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 12px;
+      justify-content: space-between;
+      background: linear-gradient(180deg, #eaf6ff 0%, #d5ebf8 100%);
+      border-color: #7eb7d8;
+      color: #12324c;
     }
 
-    .file-stack { width: 56px; height: 62px; }
+    .docs {
+      width: 78px;
+      height: 86px;
+      margin: 6px 0 12px;
+    }
 
-    .formats {
+    .fmt-list {
+      width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      width: 100%;
+      gap: 8px;
     }
 
     .fmt {
-      border: 1px solid var(--stroke-dim);
-      border-radius: var(--r-sm);
-      background: var(--fill);
-      color: var(--ice);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      border: 1px solid #9ccbe4;
+      border-radius: 8px;
+      padding: 8px 10px;
       font-family: var(--mono);
+      font-size: 13px;
+      font-weight: 700;
+      color: #0c3a58;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--cyan);
+      flex: 0 0 auto;
+    }
+
+    .input-note {
+      width: 100%;
+      text-align: center;
       font-size: 11px;
-      font-weight: 600;
-      text-align: center;
-      padding: 6px 6px;
-      letter-spacing: 0.02em;
-    }
-
-    .input-foot {
-      text-align: center;
-      padding-top: 10px;
-      border-top: 1px solid var(--stroke-dim);
-    }
-
-    .input-foot p {
-      font-size: 10.5px;
-      color: var(--muted);
       line-height: 1.4;
+      color: #3d6180;
+      padding-top: 10px;
+      border-top: 1px solid #b7d7ea;
     }
 
-    .input-foot code {
-      font-family: var(--mono);
-      font-size: 10px;
-      color: var(--stroke);
+    .input-note strong {
+      display: block;
+      color: #0c3a58;
+      font-size: 12px;
+      margin-bottom: 2px;
     }
 
-    /* —— Gutters —— */
     .gutter {
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding-top: 26px;
-      color: var(--stroke);
+      padding-top: 18px;
     }
 
-    .gutter svg { flex: 0 0 auto; }
+    .gutter svg { width: 28px; height: 16px; }
 
-    /* —— Engine —— */
     .engine {
       padding: 10px 12px 12px;
       display: flex;
       flex-direction: column;
       min-width: 0;
+      background:
+        linear-gradient(180deg, rgba(94, 200, 240, 0.08), transparent 28%),
+        linear-gradient(180deg, #0e2744, #0a1d34);
     }
 
-    .engine-head {
+    .engine-top {
       display: flex;
-      align-items: baseline;
+      align-items: center;
       justify-content: space-between;
-      gap: 12px;
       margin-bottom: 8px;
-      padding: 0 2px 8px;
-      border-bottom: 1px solid var(--stroke-dim);
+      padding: 2px 4px 8px;
+      border-bottom: 1px solid #2a5678;
     }
 
-    .engine-head h2 {
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.10em;
+    .engine-top h2 {
+      font-size: 13px;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--white);
+      color: #fff;
     }
 
-    .engine-head code {
+    .engine-top code {
       font-family: var(--mono);
-      font-size: 10px;
-      color: var(--stroke);
+      font-size: 10.5px;
+      color: var(--cyan);
     }
 
     .tracks {
-      flex: 1 1 auto;
+      flex: 1;
       min-height: 0;
       display: grid;
-      grid-template-rows: 1fr auto 1fr;
-      gap: 0;
+      grid-template-rows: 1fr 22px 1fr;
+      gap: 6px;
     }
 
     .track {
-      min-height: 0;
-      border: 1px solid var(--stroke-dim);
-      border-radius: var(--r);
-      background: var(--inset);
-      padding: 8px 10px 10px;
+      border-radius: 10px;
+      border: 1px solid #2f6a90;
+      background: #0b2036;
+      overflow: hidden;
       display: flex;
       flex-direction: column;
+      min-height: 0;
     }
 
-    .track-bar {
+    .track-h {
       display: flex;
-      align-items: baseline;
+      align-items: center;
       gap: 10px;
-      margin-bottom: 8px;
+      padding: 7px 10px;
+      color: #061018;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      font-size: 11px;
+      text-transform: uppercase;
     }
 
-    .track-bar .stepn {
-      font-family: var(--mono);
-      font-size: 10px;
+    .track.extract .track-h {
+      background: linear-gradient(90deg, #3db7e3, #7ad6f3);
+    }
+
+    .track.generate .track-h {
+      background: linear-gradient(90deg, #e59a3a, #f3c56a);
+    }
+
+    .pills {
+      margin-left: auto;
+      display: flex;
+      gap: 6px;
+      text-transform: none;
+      letter-spacing: 0;
       font-weight: 700;
-      color: var(--stroke);
-      letter-spacing: 0.04em;
-      flex: 0 0 auto;
     }
 
-    .track-bar .fn {
-      font-family: var(--mono);
-      font-size: 10.5px;
-      color: var(--ice);
-      font-weight: 600;
+    .pill {
+      font-size: 9.5px;
+      border-radius: 999px;
+      padding: 2px 7px;
+      background: rgba(6, 16, 24, 0.22);
+      color: #061018;
     }
 
-    .lane {
-      flex: 1 1 auto;
+    .pill.ok { background: #1f7a4d; color: #eafff3; }
+    .pill.bad { background: #9b1d1d; color: #ffe8e8; }
+
+    .steps {
+      flex: 1;
       min-height: 0;
       display: grid;
-      grid-template-columns: 1fr 14px 1fr 14px 1fr;
+      grid-template-columns: 1fr 18px 1fr 18px 1fr;
       align-items: stretch;
+      padding: 10px 10px 12px;
     }
 
-    .box {
-      border: 1px solid var(--stroke);
-      border-radius: var(--r-sm);
-      background: var(--panel);
+    .node {
+      border: 1px solid #4a8db3;
+      border-radius: 10px;
+      background: linear-gradient(180deg, #163552, #102844);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -372,41 +313,62 @@
       min-width: 0;
     }
 
-    .box.accent {
-      background: var(--fill);
-      border-color: var(--stroke-mid);
-    }
-
-    .box strong {
-      font-size: var(--fs-box);
-      font-weight: 650;
+    .node strong {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #fff;
       line-height: 1.2;
-      color: var(--white);
     }
 
-    .box code {
+    .node code {
       font-family: var(--mono);
-      font-size: var(--fs-code);
-      color: var(--stroke);
-      line-height: 1.25;
+      font-size: 9.5px;
+      color: var(--cyan-2);
+    }
+
+    .ico {
+      width: 22px;
+      height: 22px;
+      stroke: var(--cyan);
+      fill: none;
+      stroke-width: 1.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
     }
 
     .chev {
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--stroke);
+      color: var(--cyan);
+    }
+
+    .bridge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--cyan-2);
+    }
+
+    .bridge::before,
+    .bridge::after {
+      content: "";
+      height: 1px;
+      width: 48px;
+      background: #3d6f8f;
     }
 
     .fork {
-      flex: 1 1 auto;
+      flex: 1;
       min-height: 0;
       display: grid;
-      grid-template-columns: 132px 18px minmax(0, 1fr);
+      grid-template-columns: 150px 16px minmax(0, 1fr);
+      padding: 10px;
       align-items: stretch;
     }
-
-    .fork-src { min-height: 0; }
 
     .bracket {
       position: relative;
@@ -415,384 +377,228 @@
     .bracket::before {
       content: "";
       position: absolute;
-      left: 3px;
-      top: 22%;
-      bottom: 22%;
-      width: 10px;
-      border: 1.5px solid var(--stroke-mid);
-      border-right: none;
-      border-radius: 3px 0 0 3px;
+      left: 2px;
+      top: 18%;
+      bottom: 18%;
+      width: 11px;
+      border: 2px solid var(--cyan);
+      border-right: 0;
+      border-radius: 6px 0 0 6px;
     }
 
-    .fork-lanes {
+    .fork-out {
       display: grid;
       grid-template-rows: 1fr 1fr;
       gap: 8px;
-      min-height: 0;
     }
 
-    .join {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      height: 28px;
-      color: var(--stroke);
-      font-family: var(--mono);
-      font-size: 9.5px;
-      letter-spacing: 0.01em;
-    }
-
-    .join::before,
-    .join::after {
-      content: "";
-      height: 1px;
-      width: 36px;
-      background: var(--stroke-dim);
-    }
-
-    /* —— Outputs —— */
-    .outputs {
+    .out-shell {
+      height: calc(100% - 22px);
       display: flex;
       flex-direction: column;
-      min-height: 0;
-      height: calc(100% - 26px);
-      gap: 6px;
+      gap: 8px;
     }
 
     .card {
-      border: 1px solid var(--stroke);
-      border-radius: var(--r);
-      background: var(--navy);
-      padding: 8px 10px 9px;
-      flex: 1 1 auto;
+      flex: 1;
       min-height: 0;
+      border-radius: 12px;
+      border: 1px solid #7eb7d8;
+      background: linear-gradient(180deg, #f4fbff, #e4f2fb);
+      color: #12324c;
+      padding: 9px 11px 8px;
       display: flex;
       flex-direction: column;
     }
 
-    .card.ops { flex: 0 0 auto; }
-
-    .card-h {
+    .card h3 {
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
       display: flex;
       align-items: center;
       gap: 6px;
-      margin-bottom: 6px;
     }
 
-    .card-h h3 {
-      font-size: 9.5px;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--ice);
-      line-height: 1.25;
+    .card h3 svg {
+      width: 16px;
+      height: 16px;
+      stroke: #0b4a6e;
+      fill: none;
+      stroke-width: 1.7;
     }
 
-    .card-h code {
+    .fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px 8px;
+      font-size: 11px;
+      font-weight: 650;
+      color: #1b4664;
+    }
+
+    .fields span {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .fields i {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--cyan);
+      flex: 0 0 auto;
+      font-style: normal;
+    }
+
+    .path {
+      margin-top: auto;
+      padding-top: 5px;
       font-family: var(--mono);
       font-size: 9px;
-      color: var(--stroke);
-      font-weight: 600;
-      letter-spacing: 0;
-      text-transform: none;
-      margin-left: auto;
-      text-align: right;
+      color: #4d7390;
     }
 
-    .tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-    }
-
-    .tag {
-      font-family: var(--mono);
-      font-size: var(--fs-tag);
-      color: var(--white);
-      background: var(--fill-2);
-      border: 1px solid var(--stroke-dim);
-      border-radius: 3px;
-      padding: 2px 6px;
-      line-height: 1.35;
-    }
-
-    .ops-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 6px;
-    }
-
-    .op {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 3px;
-      text-align: center;
-      padding: 4px 2px 2px;
-    }
-
-    .op span {
-      font-size: 10px;
-      font-weight: 650;
-      color: var(--white);
-    }
-
-    .op code {
-      font-family: var(--mono);
-      font-size: 8.5px;
-      color: var(--muted);
-    }
-
-    /* —— Footer —— */
     footer.rail {
       flex: 0 0 auto;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
-      margin-top: 10px;
-      padding-top: 8px;
-      border-top: 1px solid var(--stroke-dim);
+      padding: 8px 22px 10px;
+      border-top: 1px solid #244866;
+      background: rgba(4, 14, 26, 0.45);
     }
 
     .legend {
       display: flex;
-      align-items: center;
-      gap: 16px;
+      gap: 18px;
+      font-size: 11px;
+      font-weight: 700;
     }
 
-    .leg {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: var(--fs-foot);
-      font-weight: 650;
-      color: var(--white);
-    }
-
-    .leg code {
-      font-family: var(--mono);
-      font-size: 9.5px;
-      font-weight: 500;
-      color: var(--muted);
-    }
-
-    .mark {
-      width: 11px;
-      height: 11px;
-      border-radius: 50%;
-      flex: 0 0 auto;
-    }
-
+    .leg { display: flex; align-items: center; gap: 6px; }
+    .mark { width: 10px; height: 10px; border-radius: 50%; }
     .mark.ok { background: var(--green); }
     .mark.bad { background: var(--red); }
+    .legal { font-size: 10px; color: var(--muted); letter-spacing: 0.03em; }
 
-    .legal {
-      font-size: 9.5px;
-      letter-spacing: 0.04em;
-      color: var(--muted);
-      text-align: right;
-      white-space: nowrap;
-    }
-
-    @page {
-      size: landscape;
-      margin: 0.25in;
-    }
+    @page { size: landscape; margin: 0.2in; }
 
     @media print {
-      html, body {
-        background: var(--bg) !important;
-        padding: 0;
-        min-height: 0;
-        height: 100%;
-        width: 100%;
-      }
+      html, body { background: #030910 !important; padding: 0; height: 100%; }
       body { display: block; }
       .slide {
         width: 100%;
         height: 100%;
-        padding: 10px 14px 8px;
-        overflow: hidden;
         border: 0;
+        border-radius: 0;
       }
-      * {
-        print-color-adjust: exact;
-        -webkit-print-color-adjust: exact;
-        color-adjust: exact;
-      }
+      * { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
     }
   </style>
 </head>
 <body>
-  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
-    <symbol id="i-docs" viewBox="0 0 56 62" fill="none">
-      <rect x="12" y="4" width="32" height="40" rx="2.5" stroke="#7ec4ea" stroke-width="1.4"/>
-      <path d="M18 14h20M18 20h14M18 26h16" stroke="#7ec4ea" stroke-width="1.25" stroke-linecap="round"/>
-      <rect x="8" y="10" width="32" height="40" rx="2.5" fill="#0b1c33" stroke="#d7eefb" stroke-width="1.4"/>
-      <path d="M14 20h20M14 26h13M14 32h16" stroke="#d7eefb" stroke-width="1.25" stroke-linecap="round"/>
-    </symbol>
-    <symbol id="i-scan" viewBox="0 0 24 24" fill="none">
-      <circle cx="11" cy="11" r="6" stroke="currentColor"/>
-      <path d="m16 16 4 4"/>
-    </symbol>
-    <symbol id="i-file" viewBox="0 0 24 24" fill="none">
-      <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/>
-      <path d="M14 3v5h5M8 13h8M8 17h5"/>
-    </symbol>
-    <symbol id="i-schema" viewBox="0 0 24 24" fill="none">
-      <path d="M8 5h-2v14h2M16 5h2v14h-2"/>
-      <path d="M9 8h6M9 12h6M9 16h4"/>
-    </symbol>
-    <symbol id="i-prompt" viewBox="0 0 24 24" fill="none">
-      <rect x="4" y="5" width="16" height="14" rx="2"/>
-      <path d="M8 10h8M8 14h5"/>
-    </symbol>
-    <symbol id="i-json" viewBox="0 0 24 24" fill="none">
-      <path d="M9 5c-2 0-3 1.2-3 3v2c0 1-1 2-2 2 1 0 2 1 2 2v2c0 1.8 1 3 3 3"/>
-      <path d="M15 5c2 0 3 1.2 3 3v2c0 1 1 2 2 2-1 0-2 1-2 2v2c0 1.8-1 3-3 3"/>
-    </symbol>
-    <symbol id="i-mail" viewBox="0 0 24 24" fill="none">
-      <rect x="3" y="6" width="18" height="12" rx="2"/>
-      <path d="m3 8 9 6 9-6"/>
-    </symbol>
-    <symbol id="i-brief" viewBox="0 0 24 24" fill="none">
-      <path d="M7 4h10v16H7z"/>
-      <path d="M10 9h4M10 13h4M10 17h3"/>
-    </symbol>
-    <symbol id="i-table" viewBox="0 0 24 24" fill="none">
-      <rect x="4" y="5" width="16" height="14" rx="1.5"/>
-      <path d="M4 10h16M10 5v14"/>
-    </symbol>
-    <symbol id="i-win" viewBox="0 0 24 24" fill="none">
-      <rect x="3" y="5" width="18" height="14" rx="2"/>
-      <path d="M3 9h18"/>
-    </symbol>
-    <symbol id="i-term" viewBox="0 0 24 24" fill="none">
-      <rect x="3" y="5" width="18" height="14" rx="2"/>
-      <path d="m7 10 3 2-3 2M12 14h5"/>
-    </symbol>
-    <symbol id="i-log" viewBox="0 0 24 24" fill="none">
-      <path d="M6 5h12v14H6z"/>
-      <path d="M9 9h6M9 13h6M9 17h4"/>
-    </symbol>
-    <symbol id="i-arr" viewBox="0 0 18 10" fill="none">
-      <path d="M1 5h14M11 2l5 3-5 3"/>
-    </symbol>
-  </svg>
-
   <article class="slide">
-    <header class="mast">
-      <div>
-        <p class="kicker">Project 1 · Pipeline architecture</p>
-        <h1>Complaint Case Processor</h1>
-        <p class="lede">Extract a structured <strong style="font-weight:650;color:var(--white)">CaseRecord</strong> from each local complaint file, then generate customer email and internal summary in parallel.</p>
-      </div>
-      <dl class="meta">
-        <div>
-          <dt>Runtime</dt>
-          <dd>Local batch</dd>
-        </div>
-        <div>
-          <dt>Providers</dt>
-          <dd>OpenAI / Gemini</dd>
-        </div>
-        <div>
-          <dt>Orchestration</dt>
-          <dd><code>process_folder</code></dd>
-        </div>
-      </dl>
+    <header class="banner">
+      <p class="kicker">IIT Patna USDC GenAI · Project 1</p>
+      <h1>CUSTOMER COMPLAINT CASE PROCESSOR
+        <span>PIPELINE PROCESS</span>
+      </h1>
     </header>
 
-    <div class="board">
+    <div class="stage">
       <aside>
-        <div class="col-head">
-          <span class="col-num">01</span>
-          <h2>Input</h2>
-        </div>
-        <div class="panel input-panel">
-          <div class="input-hero">
-            <svg class="file-stack" viewBox="0 0 56 62" aria-hidden="true"><use href="#i-docs"/></svg>
-            <div class="formats">
-              <div class="fmt">*.txt</div>
-              <div class="fmt">*.pdf</div>
-              <div class="fmt">*.docx</div>
-            </div>
+        <p class="col-label">Input <em>data/</em></p>
+        <div class="shell input-shell">
+          <svg class="docs" viewBox="0 0 78 86" fill="none" aria-hidden="true">
+            <rect x="22" y="6" width="42" height="54" rx="4" fill="#f7fbff" stroke="#3d6f8f" stroke-width="1.6"/>
+            <path d="M30 18h26M30 26h18M30 34h22" stroke="#5aa4cc" stroke-width="1.6" stroke-linecap="round"/>
+            <rect x="12" y="16" width="42" height="54" rx="4" fill="#0b1c33" stroke="#5ec8f0" stroke-width="1.7"/>
+            <path d="M20 30h26M20 38h16M20 46h20" stroke="#d7eefb" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+          <div class="fmt-list">
+            <div class="fmt"><span class="dot"></span>*.txt</div>
+            <div class="fmt"><span class="dot"></span>*.pdf</div>
+            <div class="fmt"><span class="dot"></span>*.docx</div>
           </div>
-          <div class="input-foot">
-            <p>Local folder <code>data/</code><br><code>loaders.list_documents</code></p>
-          </div>
+          <p class="input-note">
+            <strong>DATA_DIR</strong>
+            Local complaints · <code>list_documents</code>
+          </p>
         </div>
       </aside>
 
       <div class="gutter" aria-hidden="true">
-        <svg class="ico" viewBox="0 0 18 10"><use href="#i-arr"/></svg>
+        <svg viewBox="0 0 28 16" fill="none"><path d="M2 8h20M16 3l8 5-8 5" stroke="#5ec8f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
 
       <section>
-        <div class="col-head">
-          <span class="col-num">02</span>
-          <h2>Intelligence engine</h2>
-          <code>process_one_document</code>
-        </div>
-        <div class="panel engine">
-          <div class="engine-head">
+        <p class="col-label">Central intelligence engine <em>process_folder</em></p>
+        <div class="shell engine">
+          <div class="engine-top">
             <h2>Extract, then generate in parallel</h2>
-            <code>process_folder → process_one_document</code>
+            <code>process_one_document</code>
           </div>
-
           <div class="tracks">
-            <div class="track">
-              <div class="track-bar">
-                <span class="stepn">01</span>
-                <span class="fn">generate_structured(CaseRecord)</span>
+            <div class="track extract">
+              <div class="track-h">
+                Structured extraction
+                <span class="pills">
+                  <span class="pill ok">Completed</span>
+                  <span class="pill bad">Failed</span>
+                </span>
               </div>
-              <div class="lane">
-                <div class="box">
-                  <svg class="ico ico-lg"><use href="#i-scan"/></svg>
-                  <strong>Discover files</strong>
-                  <code>list_documents</code>
-                </div>
-                <div class="chev"><svg class="ico" viewBox="0 0 18 10"><use href="#i-arr"/></svg></div>
-                <div class="box">
-                  <svg class="ico ico-lg"><use href="#i-file"/></svg>
-                  <strong>Load text</strong>
+              <div class="steps">
+                <div class="node">
+                  <svg class="ico" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="m16 16 4 4"/></svg>
+                  <strong>Load file</strong>
                   <code>extract_text</code>
                 </div>
-                <div class="chev"><svg class="ico" viewBox="0 0 18 10"><use href="#i-arr"/></svg></div>
-                <div class="box accent">
-                  <svg class="ico ico-lg"><use href="#i-schema"/></svg>
+                <div class="chev"><svg width="16" height="10" viewBox="0 0 16 10"><path d="M1 5h11M8 2l6 3-6 3" stroke="currentColor" fill="none" stroke-width="1.6"/></svg></div>
+                <div class="node">
+                  <svg class="ico" viewBox="0 0 24 24"><path d="M8 5H6v14h2M16 5h2v14h-2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg>
                   <strong>CaseRecord</strong>
-                  <code>EXTRACTION_SYSTEM<br>EXTRACTION_USER</code>
+                  <code>Pydantic schema</code>
+                </div>
+                <div class="chev"><svg width="16" height="10" viewBox="0 0 16 10"><path d="M1 5h11M8 2l6 3-6 3" stroke="currentColor" fill="none" stroke-width="1.6"/></svg></div>
+                <div class="node">
+                  <svg class="ico" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="2"/><path d="M8 10h8M8 14h5"/></svg>
+                  <strong>LLM extract</strong>
+                  <code>generate_structured</code>
                 </div>
               </div>
             </div>
 
-            <p class="join">case.model_dump_json()</p>
+            <p class="bridge">case.model_dump_json()</p>
 
-            <div class="track">
-              <div class="track-bar">
-                <span class="stepn">02</span>
-                <span class="fn">ThreadPoolExecutor(max_workers=2)</span>
+            <div class="track generate">
+              <div class="track-h">
+                Parallel generation
+                <span class="pills">
+                  <span class="pill ok">Completed</span>
+                  <span class="pill bad">Failed</span>
+                </span>
               </div>
               <div class="fork">
-                <div class="box fork-src">
-                  <svg class="ico ico-lg"><use href="#i-json"/></svg>
+                <div class="node">
+                  <svg class="ico" viewBox="0 0 24 24"><path d="M9 5c-2 0-3 1.2-3 3v2c0 1-1 2-2 2 1 0 2 1 2 2v2c0 1.8 1 3 3 3"/><path d="M15 5c2 0 3 1.2 3 3v2c0 1 1 2 2 2-1 0-2 1-2 2v2c0 1.8-1 3-3 3"/></svg>
                   <strong>case_json</strong>
-                  <code>from CaseRecord</code>
+                  <code>ThreadPoolExecutor</code>
                 </div>
                 <div class="bracket" aria-hidden="true"></div>
-                <div class="fork-lanes">
-                  <div class="box accent">
-                    <svg class="ico"><use href="#i-mail"/></svg>
+                <div class="fork-out">
+                  <div class="node">
+                    <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="m3 8 9 6 9-6"/></svg>
                     <strong>Customer email</strong>
-                    <code>CustomerEmail · EMAIL_SYSTEM / EMAIL_USER</code>
+                    <code>CustomerEmail</code>
                   </div>
-                  <div class="box accent">
-                    <svg class="ico"><use href="#i-brief"/></svg>
+                  <div class="node">
+                    <svg class="ico" viewBox="0 0 24 24"><path d="M7 4h10v16H7z"/><path d="M10 9h4M10 13h4M10 17h3"/></svg>
                     <strong>Internal summary</strong>
-                    <code>CaseSummary · SUMMARY_SYSTEM / SUMMARY_USER</code>
+                    <code>CaseSummary</code>
                   </div>
                 </div>
               </div>
@@ -802,100 +608,57 @@
       </section>
 
       <div class="gutter" aria-hidden="true">
-        <svg class="ico" viewBox="0 0 18 10"><use href="#i-arr"/></svg>
+        <svg viewBox="0 0 28 16" fill="none"><path d="M2 8h20M16 3l8 5-8 5" stroke="#5ec8f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
 
       <aside>
-        <div class="col-head">
-          <span class="col-num">03</span>
-          <h2>Outputs</h2>
-          <code>save_case_outputs</code>
-        </div>
-        <div class="outputs">
+        <p class="col-label">Outputs <em>output/</em></p>
+        <div class="out-shell">
           <div class="card">
-            <div class="card-h">
-              <svg class="ico ico-sm"><use href="#i-schema"/></svg>
-              <h3>Structured JSON</h3>
-              <code>structured_data/*.json</code>
+            <h3>
+              <svg viewBox="0 0 24 24"><path d="M8 5H6v14h2M16 5h2v14h-2"/><path d="M9 8h6M9 12h6"/></svg>
+              Structured JSON
+            </h3>
+            <div class="fields">
+              <span><i></i>Name / email</span>
+              <span><i></i>Category</span>
+              <span><i></i>Issue / resolution</span>
+              <span><i></i>Status flags</span>
             </div>
-            <div class="tags">
-              <span class="tag">customer_name</span>
-              <span class="tag">email</span>
-              <span class="tag">phone_number</span>
-              <span class="tag">complaint_category</span>
-              <span class="tag">issue_description</span>
-              <span class="tag">resolution_provided</span>
-              <span class="tag">is_complaint</span>
-              <span class="tag">escalation_required</span>
-              <span class="tag">supporting_document_available</span>
-              <span class="tag">overall_case_status</span>
-            </div>
+            <p class="path">structured_data/*.json</p>
           </div>
-
           <div class="card">
-            <div class="card-h">
-              <svg class="ico ico-sm"><use href="#i-mail"/></svg>
-              <h3>Customer emails</h3>
-              <code>customer_emails/*.txt</code>
+            <h3>
+              <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="m3 8 9 6 9-6"/></svg>
+              Customer emails
+            </h3>
+            <div class="fields">
+              <span><i></i>Subject</span>
+              <span><i></i>Body</span>
             </div>
-            <div class="tags">
-              <span class="tag">subject</span>
-              <span class="tag">body</span>
-              <span class="tag">CustomerEmail</span>
-            </div>
+            <p class="path">customer_emails/*.txt</p>
           </div>
-
           <div class="card">
-            <div class="card-h">
-              <svg class="ico ico-sm"><use href="#i-brief"/></svg>
-              <h3>Case summaries</h3>
-              <code>case_summaries/*.txt</code>
+            <h3>
+              <svg viewBox="0 0 24 24"><path d="M7 4h10v16H7z"/><path d="M10 9h4M10 13h4"/></svg>
+              Case summaries
+            </h3>
+            <div class="fields">
+              <span><i></i>Overview / issue</span>
+              <span><i></i>Next action</span>
             </div>
-            <div class="tags">
-              <span class="tag">case_overview</span>
-              <span class="tag">key_issue</span>
-              <span class="tag">action_taken</span>
-              <span class="tag">current_status</span>
-              <span class="tag">recommended_next_action</span>
-            </div>
+            <p class="path">case_summaries/*.txt</p>
           </div>
-
           <div class="card">
-            <div class="card-h">
-              <svg class="ico ico-sm"><use href="#i-table"/></svg>
-              <h3>Final report</h3>
-              <code>final_report.csv</code>
+            <h3>
+              <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="14" rx="1.5"/><path d="M4 10h16M10 5v14"/></svg>
+              Final report
+            </h3>
+            <div class="fields">
+              <span><i></i>CSV grid</span>
+              <span><i></i>Streamlit + CLI</span>
             </div>
-            <div class="tags">
-              <span class="tag">source_file</span>
-              <span class="tag">status</span>
-              <span class="tag">CaseRecord columns</span>
-              <span class="tag">error</span>
-              <span class="tag">write_final_report</span>
-            </div>
-          </div>
-
-          <div class="card ops">
-            <div class="card-h">
-              <h3>Evaluation surfaces</h3>
-            </div>
-            <div class="ops-row">
-              <div class="op">
-                <svg class="ico"><use href="#i-win"/></svg>
-                <span>Streamlit</span>
-                <code>app.py</code>
-              </div>
-              <div class="op">
-                <svg class="ico"><use href="#i-term"/></svg>
-                <span>CLI</span>
-                <code>main.py</code>
-              </div>
-              <div class="op">
-                <svg class="ico"><use href="#i-log"/></svg>
-                <span>File log</span>
-                <code>logs/app.log</code>
-              </div>
-            </div>
+            <p class="path">final_report.csv · app.py · main.py</p>
           </div>
         </div>
       </aside>
@@ -903,10 +666,10 @@
 
     <footer class="rail">
       <div class="legend">
-        <span class="leg"><span class="mark ok"></span>Completed <code>processed</code></span>
-        <span class="leg"><span class="mark bad"></span>Failed <code>load_error · llm_error · error</code></span>
+        <span class="leg"><span class="mark ok"></span>Completed · processed</span>
+        <span class="leg"><span class="mark bad"></span>Failed · load_error / llm_error</span>
       </div>
-      <p class="legal">Evaluation artefact · IIT Patna USDC GenAI · Project 1 · Code-accurate to this repository</p>
+      <p class="legal">Retries · audit log · email review (HITL) · evaluation artefact · Chat is optional</p>
     </footer>
   </article>
 </body>

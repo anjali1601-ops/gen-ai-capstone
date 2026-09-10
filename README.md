@@ -66,18 +66,22 @@ gen-ai-capstone/
   docs/pipeline-one-pager.html
   sample_output/              Example artefacts from a local run
   scripts/create_sample_files.py
-  src/
+    src/
     pipeline.py               Extract, then email + summary in parallel
     report.py                 JSON, emails, summaries, CSV
     models.py                 CaseRecord, CustomerEmail, CaseSummary
     loaders.py                list_documents / extract_text
-    llm.py                    OpenAI / Gemini client
+    llm.py                    OpenAI / Gemini client with retries
     prompts.py
     retrieve.py               Keyword retrieval for Chat
     output_io.py              Read artefacts for the console
     auth.py                   Local hashed users (no cloud IdP)
+    audit.py                  Batch audit log
+    review.py                 Draft / approve email flags
     config.py
     logging_setup.py
+  tests/                      pytest (no live API calls)
+  .github/workflows/ci.yml
 ```
 
 Runtime folders (gitignored): `output/`, `logs/`. Keys live only in `.env`. Hashed demo accounts write to `config/users.yaml` (gitignored).
@@ -215,6 +219,19 @@ Live runs write the same layout to `output/`.
 - **Shared engine.** `app.py` and `main.py` both call `process_folder`.
 - **Keys stay in `.env`.** Never rendered in the UI.
 - **Local roles.** Streamlit sign-in is file-based (`admin` vs `analyst` / `user`). Passwords are PBKDF2-hashed. Only admin can run the batch or change provider/model.
+- **LLM retries.** Provider calls retry up to three times on transient failures (missing keys fail immediately).
+- **Audit trail.** Each batch run appends who ran it, provider/model, and counts to `logs/audit.csv` (admin can see recent rows in the sidebar).
+- **Email review.** Generated emails stay **draft** until an admin clicks **Approve**. The app does not send mail.
+
+## Tests
+
+Automated checks cover schemas, password hashing, JSON parsing, retrieval, review flags, and audit writes. They do not call OpenAI or Gemini.
+
+```powershell
+pytest
+```
+
+GitHub Actions (`.github/workflows/ci.yml`) runs the same tests on `main`.
 
 ## Limits
 
@@ -223,6 +240,7 @@ Live runs write the same layout to `output/`.
 - Missing fields are filled with `Unknown` / `Not specified` when the prompt is followed.
 - No database — a re-run overwrites same-named files in `output/`. Local users are a YAML file, not IAM.
 - Chat is keyword retrieval, not a vector index. If local files do not contain the answer, the app says so.
+- This is a **local evaluation console**, not a bank production stack: no SSO, no email gateway, no Kubernetes. Those would be the next hardening steps.
 
 ## Demo
 
@@ -231,6 +249,7 @@ Live runs write the same layout to `output/`.
 - Run the sample `data/` folder (admin)
 - Show JSON, email, summary, and `final_report.csv`
 - Point to log lines for extract → parallel email/summary
+- Show **Approve email** (human-in-the-loop) and the sidebar **Audit** rows
 - Switch provider if both keys are present
 - Chat is extra, not required for Project 1
 - Print the architecture poster from `docs/pipeline-one-pager.html` (landscape, background graphics on)

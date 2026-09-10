@@ -20,7 +20,25 @@ from src.auth import (
     directory_rows,
     load_user_store,
 )
+from src.audit import read_audit, record_audit
 from src.loaders import list_documents
+from src.llm import LLMClient, LLMError
+from src.logging_setup import setup_logging
+from src.models import CaseSummary, CustomerEmail
+from src.output_io import (
+    SUMMARIES_DIR,
+    artefact_path,
+    list_source_files,
+    load_case_summary,
+    load_customer_email,
+    read_final_report,
+    read_text_file,
+    report_path,
+    row_for_source,
+)
+from src.pipeline import process_folder
+from src.retrieve import RetrievedSource, build_corpus, retrieve
+from src.review import APPROVED, DRAFT, get_status, set_status
 from src.llm import LLMClient, LLMError
 from src.logging_setup import setup_logging
 from src.models import CaseSummary, CustomerEmail
@@ -519,6 +537,21 @@ def render_sidebar(user: AuthUser, input_dir: Path, output_dir: Path) -> tuple[s
 
         if user.is_admin:
             st.divider()
+            st.markdown('<p class="settings-section">Audit</p>', unsafe_allow_html=True)
+            audit_rows = read_audit(limit=8)
+            if audit_rows:
+                st.dataframe(
+                    pd.DataFrame(audit_rows)[
+                        ["timestamp", "actor", "processed", "failed"]
+                    ],
+                    use_container_width=True,
+                    hide_index=True,
+                    height=min(200, 48 + 32 * len(audit_rows)),
+                )
+            else:
+                st.caption("No batch runs recorded yet.")
+
+            st.divider()
             st.markdown('<p class="settings-section">Directory</p>', unsafe_allow_html=True)
             rows = directory_rows()
             if rows:
@@ -562,11 +595,17 @@ def _empty_state(title: str, body: str) -> None:
 
 
 def _status_pill(status: str) -> str:
-    cls = "ok" if status == "processed" else "bad"
+    cls = "ok" if status in {"processed", APPROVED} else "bad"
     return f'<span class="status-pill {cls}">{html.escape(status)}</span>'
 
 
-def run_batch(provider: str, model: str, data_dir: Path, output_dir: Path) -> None:
+def run_batch(
+    provider: str,
+    model: str,
+    data_dir: Path,
+    output_dir: Path,
+    actor: str,
+) -> None:
     logs: list[str] = []
     st.session_state.just_finished = False
     st.session_state.last_error = None
@@ -594,6 +633,16 @@ def run_batch(provider: str, model: str, data_dir: Path, output_dir: Path) -> No
                 on_progress=on_progress,
             )
         processed = sum(1 for item in results if item.status == "processed")
+        failed = len(results) - processed
+        record_audit(
+            actor=actor,
+            action="run_batch",
+            provider=client.provider,
+            model=client.model,
+            total=len(results),
+            processed=processed,
+            failed=failed,
+        )
         on_event(f"Complete. {processed}/{len(results)} document(s) processed.")
         progress.progress(1.0)
         st.session_state.just_finished = True
@@ -603,6 +652,13 @@ def run_batch(provider: str, model: str, data_dir: Path, output_dir: Path) -> No
         on_event(f"Error: {exc}")
         st.session_state.last_error = str(exc)
         st.error(str(exc))
+        record_audit(
+            actor=actor,
+            action="run_batch",
+            provider=provider,
+            model=model,
+            detail=str(exc),
+        )
     except (FileNotFoundError, OSError) as exc:
         logger.exception("Batch processing failed (filesystem)")
         on_event(f"Error: {exc}")
@@ -651,7 +707,13 @@ def _render_detail_card(title: str, body: str) -> None:
     )
 
 
-def render_document_details(output_dir: Path, report: pd.DataFrame | None) -> None:
+def render_document_details(
+    output_dir: Path,
+    report: pd.DataFrame | None,
+    *,
+    is_admin: bool,
+    reviewer: str,
+) -> None:
     names = list_source_files(output_dir, report)
     if not names:
         _empty_state(
@@ -687,6 +749,34 @@ def render_document_details(output_dir: Path, report: pd.DataFrame | None) -> No
     with brief_col:
         _render_detail_card("Management brief", _brief_block_text(summary, summary_raw))
 
+    review_status = get_status(output_dir, selected)
+    st.markdown(
+        f"Review {_status_pill(review_status)}",
+        unsafe_allow_html=True,
+    )
+    st.caption(
+        "Generated emails stay Draft until an administrator approves them. "
+        "This console does not send mail."
+    )
+    if is_admin:
+        approve_col, draft_col, _ = st.columns([1, 1, 2])
+        with approve_col:
+            if st.button(
+                "Approve email",
+                key=f"approve_{selected}",
+                disabled=review_status == APPROVED,
+            ):
+                set_status(output_dir, selected, APPROVED, reviewer)
+                st.rerun()
+        with draft_col:
+            if st.button(
+                "Return to draft",
+                key=f"draft_{selected}",
+                disabled=review_status == DRAFT,
+            ):
+                set_status(output_dir, selected, DRAFT, reviewer)
+                st.rerun()
+
 
 def _queue_caption(files: list[Path]) -> str:
     names = [path.name for path in files]
@@ -702,6 +792,7 @@ def render_dashboard(
     output_dir: Path,
     *,
     is_admin: bool,
+    actor: str,
 ) -> None:
     files, input_error = _input_files(input_dir)
 
@@ -732,7 +823,7 @@ def render_dashboard(
                 st.session_state.last_error = input_error
                 st.error(input_error)
             else:
-                run_batch(provider, model, input_dir, output_dir)
+                run_batch(provider, model, input_dir, output_dir, actor)
 
         if st.session_state.last_error and not run_clicked:
             st.error(st.session_state.last_error)
@@ -806,7 +897,12 @@ def render_dashboard(
             "error": st.column_config.TextColumn("error", width="medium"),
         },
     )
-    render_document_details(output_dir, report)
+    render_document_details(
+        output_dir,
+        report,
+        is_admin=is_admin,
+        reviewer=actor,
+    )
 
     if is_admin and st.session_state.logs:
         st.markdown('<p class="section-label">Run log</p>', unsafe_allow_html=True)
@@ -942,7 +1038,14 @@ def main() -> None:
 
     dashboard_tab, chat_tab = st.tabs(["Dashboard", "Chat"])
     with dashboard_tab:
-        render_dashboard(provider, model, input_dir, output_dir, is_admin=user.is_admin)
+        render_dashboard(
+            provider,
+            model,
+            input_dir,
+            output_dir,
+            is_admin=user.is_admin,
+            actor=user.username,
+        )
     with chat_tab:
         render_chat(provider, model, input_dir, output_dir, user.username)
 

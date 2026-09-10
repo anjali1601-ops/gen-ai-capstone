@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 import threading
+import time
 from typing import Type, TypeVar
 
 import google.generativeai as genai
@@ -14,10 +16,18 @@ from pydantic import BaseModel, ValidationError
 from src import config
 
 T = TypeVar("T", bound=BaseModel)
+logger = logging.getLogger(__name__)
+
+LLM_MAX_ATTEMPTS = 3
 
 
 class LLMError(Exception):
     pass
+
+
+def _is_permanent_llm_error(exc: LLMError) -> bool:
+    text = str(exc).lower()
+    return "missing or empty" in text or "must be 'openai' or 'gemini'" in text
 
 
 def _missing_key_message(key_name: str, provider: str) -> str:
@@ -101,9 +111,24 @@ class LLMClient:
         return self._complete(system_prompt, user_prompt, json_mode=False)
 
     def _complete(self, system_prompt: str, user_prompt: str, json_mode: bool = True) -> str:
-        if self.provider == "openai":
-            return self._complete_openai(system_prompt, user_prompt, json_mode=json_mode)
-        return self._complete_gemini(system_prompt, user_prompt, json_mode=json_mode)
+        last_error: LLMError | None = None
+        for attempt in range(1, LLM_MAX_ATTEMPTS + 1):
+            try:
+                if self.provider == "openai":
+                    return self._complete_openai(system_prompt, user_prompt, json_mode=json_mode)
+                return self._complete_gemini(system_prompt, user_prompt, json_mode=json_mode)
+            except LLMError as exc:
+                last_error = exc
+                if _is_permanent_llm_error(exc) or attempt == LLM_MAX_ATTEMPTS:
+                    raise
+                logger.warning(
+                    "LLM call failed (attempt %s/%s): %s",
+                    attempt,
+                    LLM_MAX_ATTEMPTS,
+                    exc,
+                )
+                time.sleep(0.6 * attempt)
+        raise last_error or LLMError("LLM request failed.")
 
     def _complete_openai(self, system_prompt: str, user_prompt: str, json_mode: bool) -> str:
         try:

@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Callable, Optional
 
 from src import config
+from src.audit import record_audit
 from src.llm import LLMClient
 from src.pipeline import DocumentResult, process_folder
 
@@ -41,13 +42,24 @@ def run_batch(
         on_event(f"Provider: {client.provider} | Model: {client.model}")
         on_event(f"Input: {data_dir}")
         on_event(f"Output: {out_dir}")
-    return process_folder(
+    results = process_folder(
         data_dir,
         out_dir,
         client,
         on_event=on_event,
         on_progress=on_progress,
     )
+    processed = sum(1 for item in results if item.status == "processed")
+    record_audit(
+        actor="cli",
+        action="run_batch",
+        provider=client.provider,
+        model=client.model,
+        total=len(results),
+        processed=processed,
+        failed=len(results) - processed,
+    )
+    return results
 
 
 def main() -> None:
