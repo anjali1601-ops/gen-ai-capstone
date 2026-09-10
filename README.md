@@ -1,126 +1,92 @@
-# AI Customer Complaint & Case Processing System
+# Complaint Case Processor
 
-IIT Patna USDC GenAI Development Program — Final Evaluation **Project 1**.
+Local batch workflow that turns customer complaint files into structured case records, customer emails, and manager summaries. Built for IIT Patna USDC GenAI **Project 1**.
 
-This application reads a folder of customer complaint documents and runs a **three-step GenAI workflow** on each file:
+Each file is processed in three LLM steps: extract a Pydantic `CaseRecord`, then generate a customer email and an internal summary **in parallel**. The Streamlit console and the CLI share the same engine (`src.pipeline.process_folder`).
 
-1. Structured information extraction (Pydantic schema)
-2. Professional customer response email
-3. Internal management case summary
+## What it does
 
-Email and summary run **in parallel** after extraction. The app is **not** one large LLM call.
+Support teams receive complaints as `.txt`, `.pdf`, and `.docx`. This product:
 
-The Streamlit window has two tabs: **Dashboard** (required Project 1 batch UI) and **Chat** (optional extra — grounded Q&A over local files, not required by the Project 1 brief).
+1. Reads every supported file in `data/`
+2. Extracts a validated `CaseRecord`
+3. Writes `customer_emails/*.txt` and `case_summaries/*.txt` from those fields (not a second unrestricted read of the raw file)
+4. Consolidates results in `output/final_report.csv`
 
-## Problem statement
+Optional **Chat** answers questions from retrieved local files and generated artefacts only.
 
-Support teams receive complaints as `.txt`, `.pdf`, and `.docx` files. The goal is to batch-process those files locally, produce consistent structured records, customer emails, and manager summaries, then write a CSV report.
-
-## Solution overview
-
-- Load every supported file in `data/`
-- Send document text to OpenAI or Gemini with a strict extraction prompt
-- Validate the model JSON with Pydantic (`CaseRecord`)
-- Generate a customer email and an internal summary from the **extracted fields**, not from a second unrestricted read of the raw file
-- Save outputs under `output/` and show live progress in the Streamlit Dashboard
-- Optional Chat tab retrieves local complaint/output text and answers only from those sources
-
-## Architecture
+Architecture poster: [docs/pipeline-one-pager.html](docs/pipeline-one-pager.html)
 
 ```text
 data/*.txt, *.pdf, *.docx
-        |
-        v
- loaders.py  (error handling per file)
-        |
-        v
- pipeline.py
-        |
-        v
- LLM step 1: structured extraction  -->  Pydantic CaseRecord
-        |
-        +------------------+------------------+
-        v                                     v
- LLM step 2: customer email         LLM step 3: case summary
-        |                                     |
-        +------------------+------------------+
-                           v
-        report.py  -->  output/structured_data/*.json
-                        output/customer_emails/*.txt
-                        output/case_summaries/*.txt
-                        output/final_report.csv
-                           |
-           +---------------+---------------+
-           v                               v
- Streamlit Dashboard              Optional Chat
- (app.py)                         (retrieve.py + output_io.py)
+        │
+        ▼
+ loaders.list_documents / extract_text
+        │
+        ▼
+ process_folder → process_one_document
+        │
+        ▼
+ 1/3  generate_structured(CaseRecord)
+        │
+        │  case.model_dump_json()
+        ▼
+ 2/3–3/3  ThreadPoolExecutor(max_workers=2)
+        ├── CustomerEmail
+        └── CaseSummary
+        │
+        ▼
+ output/structured_data  customer_emails  case_summaries  final_report.csv
+        │
+        ├── Streamlit  app.py
+        └── CLI        main.py
 ```
 
-```mermaid
-flowchart TD
-  A["data/*.txt, *.pdf, *.docx"] --> B["loaders.py"]
-  B --> C["pipeline.py"]
-  C --> D["LLM extract + Pydantic CaseRecord"]
-  D --> E["LLM customer email"]
-  D --> F["LLM case summary"]
-  E --> G["report.py"]
-  F --> G
-  G --> H["output JSON, emails, summaries, CSV"]
-  H --> I["Streamlit Dashboard"]
-  H --> J["Optional Chat via retrieve.py"]
-  K["main.py CLI"] --> C
-  L["app.py"] --> C
-```
-
-`main.py` and `app.py` both call `src.pipeline.process_folder`. `run_batch.py` is a thin CLI alias of the same workflow.
-
-## Technology stack
+## Stack
 
 - Python 3.11+
-- OpenAI API or Google Gemini API (free-tier keys are enough)
-- Pydantic for structured outputs
-- pypdf and python-docx for file reading
-- Streamlit for the Dashboard (and optional Chat tab)
-- pandas for reading `final_report.csv` in the UI
-- Logging to `logs/app.log`
+- OpenAI or Gemini (Pydantic-validated structured output)
+- pypdf, python-docx
+- Streamlit operations console with local sign-in (`admin` vs `analyst` / `user`)
+- pandas for `final_report.csv`
+- File log: `logs/app.log`
 
-## Project structure
+## Repository
 
 ```text
 gen-ai-capstone/
-  main.py                Preferred CLI entry point
-  app.py                 Streamlit Dashboard + optional Chat
-  run_batch.py           CLI alias (same batch workflow as main.py)
+  app.py                      Streamlit console (login, Dashboard + Chat)
+  main.py                     CLI entry
+  run_batch.py                CLI alias of the same batch
   requirements.txt
   .env.example
-  data/                  Sample input complaints (.txt, .pdf, .docx)
-  sample_output/         Example artefacts from a live local run
-  scripts/               Helpers to rebuild sample PDF/DOCX files
+  config/users.example.yaml   Demo accounts (copy or first-run bootstrap)
+  .streamlit/config.toml      Theme
+  data/                       Sample complaints (.txt, .pdf, .docx)
+  docs/pipeline-one-pager.html
+  sample_output/              Example artefacts from a local run
+  scripts/create_sample_files.py
   src/
-    pipeline.py          Extract, then email + summary in parallel
-    retrieve.py          Keyword retrieval for optional Chat
-    output_io.py         Read saved artefacts for the Streamlit window
-    report.py            Write JSON, emails, summaries, and CSV
-    config.py
-    loaders.py
-    models.py
+    pipeline.py               Extract, then email + summary in parallel
+    report.py                 JSON, emails, summaries, CSV
+    models.py                 CaseRecord, CustomerEmail, CaseSummary
+    loaders.py                list_documents / extract_text
+    llm.py                    OpenAI / Gemini client
     prompts.py
-    llm.py
+    retrieve.py               Keyword retrieval for Chat
+    output_io.py              Read artefacts for the console
+    auth.py                   Local hashed users (no cloud IdP)
+    config.py
     logging_setup.py
 ```
 
-## Setup instructions (Windows)
+Runtime folders (gitignored): `output/`, `logs/`. Keys live only in `.env`. Hashed demo accounts write to `config/users.yaml` (gitignored).
 
-1. Install Python 3.11 or newer from https://www.python.org/downloads/  
-   During install, tick **Add python.exe to PATH**.
+## Setup (Windows)
 
-2. Open **PowerShell** and go to this folder:
+1. Install Python 3.11+ from https://www.python.org/downloads/ and tick **Add python.exe to PATH**.
 
-   ```powershell
-   cd C:\Users\Hetero\gen-ai-capstone
-   ```
-
-3. Create a virtual environment and install packages:
+2. In PowerShell, from this repository:
 
    ```powershell
    python -m venv .venv
@@ -129,13 +95,13 @@ gen-ai-capstone/
    pip install -r requirements.txt
    ```
 
-4. Copy the example environment file and add **one or both** API keys:
+3. Copy the example env file and add **one or both** provider keys:
 
    ```powershell
    copy .env.example .env
    ```
 
-   Open `.env` in Notepad and paste your keys. Do not share this file and never commit it to GitHub.
+   Edit `.env` locally. Do not commit it.
 
    ```text
    OPENAI_API_KEY=your_openai_key
@@ -145,123 +111,126 @@ gen-ai-capstone/
    GEMINI_MODEL=gemini-2.0-flash
    ```
 
-   If Gemini returns a model error, try `gemini-1.5-flash` or `gemini-2.5-flash`.
+   If Gemini rejects the default model, try `gemini-1.5-flash` or `gemini-2.5-flash`.
 
-5. Sample `.txt`, `.docx`, and `.pdf` files are already in `data/`. Rebuild the Word/PDF files only if you need to:
+4. Local sign-in uses `config/users.example.yaml`. On first Streamlit launch the app hashes those demo passwords and writes `config/users.yaml` (gitignored). To create that file yourself:
+
+   ```powershell
+   copy config\users.example.yaml config\users.yaml
+   ```
+
+   The app still hashes plaintext passwords on load. Do not commit `config/users.yaml`.
+
+5. Sample files are already in `data/`. Rebuild Word/PDF samples only if needed:
 
    ```powershell
    python scripts\create_sample_files.py
    ```
 
-## Environment variables
+## Environment
 
 | Variable | Required | Purpose |
 | --- | --- | --- |
-| `OPENAI_API_KEY` | If using OpenAI | OpenAI API key |
-| `GEMINI_API_KEY` | If using Gemini | Google Gemini API key |
+| `OPENAI_API_KEY` | If using OpenAI | Provider key |
+| `GEMINI_API_KEY` | If using Gemini | Provider key |
 | `LLM_PROVIDER` | Optional | `openai` (default) or `gemini` |
 | `OPENAI_MODEL` | Optional | Default `gpt-4o-mini` |
 | `GEMINI_MODEL` | Optional | Default `gemini-2.0-flash` |
-| `DATA_DIR` | Optional | Override input folder (defaults to `data/`) |
-| `OUTPUT_DIR` | Optional | Override output folder (defaults to `output/`) |
+| `DATA_DIR` | Optional | Override input folder (default `data/`) |
+| `OUTPUT_DIR` | Optional | Override output folder (default `output/`) |
+| `APP_SECRET` | Optional | Extra hash pepper. Leave blank for the class demo. If you set it, do so before the first `users.yaml` bootstrap. |
 
-Copy `.env.example` to `.env`. Put keys only in `.env`. This README never contains real keys.
+This README does not contain real keys.
 
-## How to run
+## Run
 
-Keep the virtual environment activated. This app is meant to run on **your computer**, not on a public website.
+Keep the virtual environment activated. This is a **local** workflow.
 
-### Streamlit (Dashboard + optional Chat)
-
-```powershell
-.\.venv\Scripts\streamlit run app.py
-```
-
-If you already ran `.\.venv\Scripts\activate`, this also works:
+### Streamlit
 
 ```powershell
 streamlit run app.py
 ```
 
-Your browser should open `http://localhost:8501`. If it does not, paste that address yourself.
+Or: `.\.venv\Scripts\streamlit run app.py`
 
-After you change `.env`, restart Streamlit (Ctrl+C in the terminal, then run it again).
+Opens `http://localhost:8501`. Sign in before the console appears. After changing `.env`, restart Streamlit (Ctrl+C, then run again).
 
-1. In the sidebar, choose **OpenAI** or **Gemini** and a model.
-2. Confirm the input folder is `data` and the output folder is `output` (already filled in).
-3. Stay on the **Dashboard** tab and click **Run Batch Processing**.
-4. Watch the live log: file opened → structured extraction → email + summary.
-5. When it finishes, the table shows `final_report.csv`. Use **Select Document to View Details** for the customer email and management brief.
-6. Open the `output/` folder for JSON, emails, summaries, and `final_report.csv`.
+**Demo credentials (evaluation only — not for production):**
 
-The **Chat** tab is optional. It answers questions using retrieved text from `data/` and `output/` only. You do not need it for the Project 1 demonstration.
+| Username | Password | Role | What they can do |
+| --- | --- | --- | --- |
+| `admin` | `DemoAdmin!2026` | Admin | Run batch, change provider/model, view the user directory, chat, see all outputs |
+| `priya` | `DemoAnalyst1!2026` | Analyst | View dashboard results and chat. Cannot run batch or change Settings |
+| `arjun` | `DemoAnalyst2!2026` | Analyst | Same as priya |
+| `kavya` | `DemoUser!2026` | User | Same as priya |
 
-Stop the window with **Ctrl+C** in the terminal.
+1. Sign in as **admin** to operate the system, or as an analyst/user to review results.
+2. Admin only: in the sidebar, choose **OpenAI** or **Gemini** and a model.
+3. Confirm input `data/` and output `output/`.
+4. Admin only: on **Dashboard**, click **Run batch**.
+5. Review `final_report.csv`, then open a source file for the email and brief.
+6. **Chat** is optional and stored per signed-in username. Grounded Q&A over `data/` and `output/` only.
+7. Use **Log out** in the sidebar to switch accounts.
 
-### CLI (preferred entry point)
+### CLI
 
 ```powershell
 python main.py
 ```
 
-`run_batch.py` is an alias that runs the same folder workflow if you prefer that filename:
-
-```powershell
-python run_batch.py
-```
+`python run_batch.py` is the same folder workflow.
 
 ## Sample inputs
 
-Five complaints in `data/` covering all required formats:
-
-| File | Format | What it contains |
+| File | Format | Contents |
 | --- | --- | --- |
-| complaint_001.txt | text | Duplicate billing charge, attachment, supervisor requested |
-| complaint_002.txt | text | Late delivery and crushed carton |
+| complaint_001.txt | text | Duplicate billing, attachment, supervisor requested |
+| complaint_002.txt | text | Late delivery, crushed carton |
 | complaint_003.docx | Word | Defective smart watch, already escalated |
-| complaint_004.pdf | PDF | Password reset email never arrives |
-| complaint_005.pdf | PDF | **Not** a complaint — product feedback only |
+| complaint_004.pdf | PDF | Password-reset email never arrives |
+| complaint_005.pdf | PDF | Product feedback — not a complaint |
 
 ## Sample outputs
 
-`sample_output/` is a copy of artefacts from a successful local API run on the five sample files. Wording can differ if you re-run the models.
+`sample_output/` is a snapshot from a successful local run. Wording can change if you re-run the models.
 
 ```text
 sample_output/
-  structured_data/complaint_001.json ... complaint_005.json
-  customer_emails/complaint_001.txt ... complaint_005.txt
-  case_summaries/complaint_001.txt ... complaint_005.txt
+  structured_data/*.json
+  customer_emails/*.txt
+  case_summaries/*.txt
   final_report.csv
 ```
 
-After you run the app, live results are written to `output/` in the same layout. `output/` is gitignored so generated files and any local secrets stay off GitHub.
+Live runs write the same layout to `output/`.
 
-The CSV includes extracted Pydantic fields such as `issue_description` and `resolution_provided`, plus status and error columns.
+## Design
 
-## Key design decisions
+- **Three LLM calls, not one.** Extraction is separate from writing.
+- **Pydantic validation.** Raw model text is not the system of record.
+- **Grounding.** Email and summary prompts must not invent refunds, dates, or contacts.
+- **Per-file errors.** One bad PDF does not stop the folder.
+- **Parallel generation.** Email and summary share `case_json` after extract.
+- **Shared engine.** `app.py` and `main.py` both call `process_folder`.
+- **Keys stay in `.env`.** Never rendered in the UI.
+- **Local roles.** Streamlit sign-in is file-based (`admin` vs `analyst` / `user`). Passwords are PBKDF2-hashed. Only admin can run the batch or change provider/model.
 
-- **Three LLM calls, not one.** Extraction is separate from writing. That matches the brief and reduces mixed-up emails.
-- **Pydantic validation.** Raw model text is never saved as the system of record.
-- **Grounding.** Email and summary prompts are told not to invent refunds, dates, or contact details.
-- **Batch + per-file errors.** One bad PDF does not stop the rest of the folder.
-- **Parallel email and summary.** Extraction must finish first; the two generation tasks can run together.
-- **Shared engine.** Streamlit (`app.py`) and the CLI (`main.py`) call the same `process_folder` pipeline.
-- **Optional Chat is extra.** Dashboard batch processing is the Project 1 requirement. Chat uses `retrieve.py` over local files only.
-- **Keys stay in `.env`.** `.gitignore` excludes `.env`, `.venv`, `__pycache__/`, and `output/`. `sample_output/` is tracked.
+## Limits
 
-## Limitations
-
-- Free API tiers can rate-limit if you click Process repeatedly.
+- Free API tiers can rate-limit if you run the batch repeatedly.
 - Scanned PDFs with no selectable text cannot be read.
-- The model may still omit a field; missing values are filled with `Unknown` / `Not specified` when the prompt is followed.
-- There is no database; each run overwrites files with the same name in `output/`.
-- Optional Chat is keyword retrieval, not a vector database. If the local files do not contain an answer, the app says so.
+- Missing fields are filled with `Unknown` / `Not specified` when the prompt is followed.
+- No database — a re-run overwrites same-named files in `output/`. Local users are a YAML file, not IAM.
+- Chat is keyword retrieval, not a vector index. If local files do not contain the answer, the app says so.
 
-## Demonstration checklist
+## Demo
 
-- Open the Streamlit window
-- On **Dashboard**, process the sample `data/` folder
+- Open the Streamlit console and sign in as `admin` (see demo table above)
+- Optionally log out and sign in as `priya` to show view-only dashboard + chat
+- Run the sample `data/` folder (admin)
 - Show JSON, email, summary, and `final_report.csv`
-- Point to the log lines for extract → email/summary
-- Switch provider (OpenAI vs Gemini) if both keys are present
-- Chat tab is optional extra credit, not required for Project 1
+- Point to log lines for extract → parallel email/summary
+- Switch provider if both keys are present
+- Chat is extra, not required for Project 1
+- Print the architecture poster from `docs/pipeline-one-pager.html` (landscape, background graphics on)

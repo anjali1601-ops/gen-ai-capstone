@@ -1,0 +1,22 @@
+# Demo accounts for the local IIT Patna evaluation only.
+# Copy this file to config/users.yaml (gitignored) or let the app do it on first run.
+# The app hashes every password with PBKDF2-SHA256 and writes config/users.yaml.
+# These passwords are also listed in README.md. Do not use them outside this demo.
+
+users:
+  - username: admin
+    name: Operations Admin
+    role: admin
+    password: DemoAdmin!2026
+  - username: priya
+    name: Priya Sharma
+    role: analyst
+    password: DemoAnalyst1!2026
+  - username: arjun
+    name: Arjun Mehta
+    role: analyst
+    password: DemoAnalyst2!2026
+  - username: kavya
+    name: Kavya Iyer
+    role: user
+    password: DemoUser!2026

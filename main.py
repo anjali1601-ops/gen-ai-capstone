@@ -54,7 +54,7 @@ def main() -> None:
     _, output_dir = default_folders()
     results = run_batch(on_event=print)
     processed = sum(1 for item in results if item.status == "processed")
-    print(f"Done. {processed}/{len(results)} document(s) processed.")
+    print(f"Complete. {processed}/{len(results)} document(s) processed.")
     print(f"Report: {output_dir / 'final_report.csv'}")
 
 

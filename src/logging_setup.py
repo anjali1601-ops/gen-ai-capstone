@@ -1,4 +1,4 @@
-"""Basic logging used by both the command-line runner and the window."""
+"""Shared file and console logging for the CLI and Streamlit app."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import logging
 from src.config import LOG_DIR
 
 
-def setup_logging(name: str = "complaint_workflow") -> logging.Logger:
+def setup_logging(name: str = "complaint_case_processor") -> logging.Logger:
     LOG_DIR.mkdir(parents=True, exist_ok=True)
     logger = logging.getLogger(name)
     if logger.handlers:

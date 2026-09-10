@@ -26,8 +26,8 @@ def _missing_key_message(key_name: str, provider: str) -> str:
         config.gemini_key_ready() if provider == "openai" else config.openai_key_ready()
     )
     message = (
-        f"{key_name} is missing or empty. Add it to the .env file next to app.py, "
-        "then restart Streamlit (Ctrl+C in the terminal, then run it again)."
+        f"{key_name} is missing or empty. Add it to .env next to app.py, "
+        "then restart Streamlit."
     )
     if other_ready:
         return (

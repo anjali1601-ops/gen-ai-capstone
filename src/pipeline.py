@@ -53,7 +53,7 @@ def process_folder(
     notify(on_event, f"Found {len(files)} document(s) in {data_dir}")
 
     for index, path in enumerate(files, start=1):
-        notify(on_event, f"[{index}/{len(files)}] Starting {path.name}")
+        notify(on_event, f"[{index}/{len(files)}] Processing {path.name}")
         results.append(process_one_document(path, output_dir, client, on_event))
         if on_progress:
             on_progress(index, len(files) or 1)
@@ -77,7 +77,7 @@ def process_one_document(
         return DocumentResult(source_file=path.name, status="load_error", error=str(exc))
 
     try:
-        notify(on_event, f"{path.name}: step 1/3 structured extraction")
+        notify(on_event, f"{path.name}: 1/3 extract CaseRecord")
         case = client.generate_structured(
             CaseRecord,
             prompts.EXTRACTION_SYSTEM,
@@ -85,7 +85,7 @@ def process_one_document(
         )
 
         case_json = case.model_dump_json(indent=2)
-        notify(on_event, f"{path.name}: step 2/3 and 3/3 email + internal summary (parallel)")
+        notify(on_event, f"{path.name}: 2/3–3/3 generate email and summary (parallel)")
 
         with ThreadPoolExecutor(max_workers=2) as pool:
             email_future = pool.submit(
@@ -104,7 +104,7 @@ def process_one_document(
             summary = summary_future.result()
 
         save_case_outputs(output_dir, path.stem, case, email, summary)
-        notify(on_event, f"{path.name}: saved outputs")
+        notify(on_event, f"{path.name}: wrote artefacts")
         return DocumentResult(
             source_file=path.name,
             status="processed",

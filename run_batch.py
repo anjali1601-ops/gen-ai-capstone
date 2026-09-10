@@ -1,4 +1,4 @@
-"""Command-line runner for evaluators who prefer the terminal."""
+"""CLI alias of the same batch workflow as main.py."""
 
 from src import config
 from src.llm import LLMClient
@@ -11,7 +11,7 @@ def main() -> None:
     print(f"Provider: {client.provider} | Model: {client.model}")
     results = process_folder(config.DATA_DIR, config.OUTPUT_DIR, client)
     processed = sum(1 for item in results if item.status == "processed")
-    print(f"Done. {processed}/{len(results)} document(s) processed.")
+    print(f"Complete. {processed}/{len(results)} document(s) processed.")
     print(f"Report: {config.OUTPUT_DIR / 'final_report.csv'}")
 
 

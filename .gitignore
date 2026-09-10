@@ -1,10 +1,11 @@
 .env
+config/users.yaml
 .venv/
 venv/
 __pycache__/
 *.pyc
 .pytest_cache/
-.streamlit/
+.streamlit/secrets.toml
 # Live batch output. sample_output/ is tracked for evaluators.
 output/
 logs/

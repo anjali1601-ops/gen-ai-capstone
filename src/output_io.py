@@ -1,4 +1,4 @@
-"""Read pipeline artefacts from disk for the Streamlit evaluation window."""
+"""Read saved pipeline artefacts for the Streamlit console."""
 
 from __future__ import annotations
 
